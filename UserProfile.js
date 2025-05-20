@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -11,8 +11,12 @@ import {
   Platform,
 } from 'react-native';
 import SocialInputRow from './SocialInputRow';
+import axios from 'axios';
+import {useSelector} from 'react-redux';
 
 const UserInfoScreen = () => {
+  const token = useSelector(state => state.auth.token);
+
   const [username, setUsername] = useState('');
   const [mobile, setMobile] = useState('');
   const [instagram, setInstagram] = useState('');
@@ -23,6 +27,27 @@ const UserInfoScreen = () => {
     // Handle save logic here
     console.log({username, mobile, instagram});
   };
+  const fetchUserData = async () => {
+    console.log('funcf');
+    const API_URL = 'http://34.220.144.31:8000/fetch-metadata/';
+    const body = {};
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    };
+    try {
+      const res = await axios.get(API_URL, body, {
+        headers,
+      });
+      console.log(res.data);
+    } catch {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
 
   return (
     <KeyboardAvoidingView
@@ -86,7 +111,7 @@ const UserInfoScreen = () => {
 
       {/* Save Button Fixed at Bottom */}
       <View style={styles.bottomContainer}>
-        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+        <TouchableOpacity style={styles.saveButton} onPress={fetchUserData}>
           <Text style={styles.saveButtonText}>Save</Text>
         </TouchableOpacity>
       </View>
