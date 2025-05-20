@@ -10,10 +10,11 @@ import {
     TouchableOpacity,
     Image,
 } from 'react-native';
+import { useSelector } from 'react-redux';
 import Geolocation from 'react-native-geolocation-service';
 
 const API_URL = 'http://34.220.144.31:8000/fetch-users-mg';
-const API_URL2 = 'http://34.220.144.31:8000/update-location2';
+const API_URL2 = 'http://34.220.144.31:8000/update-location';
 
 // const AUTH_TOKEN =
 //   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFuYW50MDEiLCJpYXQiOjE3NDc1ODkzNTUsImV4cCI6MTc0NzU5Mjk1NX0.jLoQZ7pYhfAUTQa4up9z4yXDT1s17_8l8c6o1j_0OXQ';
@@ -43,23 +44,27 @@ const requestLocationPermission = async () => {
     }
 };
 
-const Home = ({ route }) => {
+const Home = () => {
     // state to hold location
-    const { token } = route.params;
-    console.log("tokennnn", route.params);
-    const AUTH_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJpYXQiOjE3NDc2MzUyMTEsImV4cCI6MTc0NzYzODgxMX0.5tcFnPLLCQln5b6giay8SBfKek8ct4cJIrAk5K2TStQ";
-    console.log(AUTH_TOKEN);
+    const token = useSelector((state) => state.auth.token);
+    console.log(token);
+    // const { token } = route.params;
+    // console.log("tokennnn", route.params);
+    // const AUTH_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJpYXQiOjE3NDc2MzUyMTEsImV4cCI6MTc0NzYzODgxMX0.5tcFnPLLCQln5b6giay8SBfKek8ct4cJIrAk5K2TStQ";
+    // console.log(AUTH_TOKEN);
     const [location, setLocation] = useState(false);
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false)
     const sendLocation = async () => {
-        await getLocation();
+        const coords = await getLocation();
         try {
-            if (location) {
+            if (coords) {
+
+                console.log(coords);
 
                 const body = {
-                    lat: location.coords.latitude,
-                    lng: location.coords.longitude,
+                    lat: coords.latitude,
+                    lng: coords.longitude,
                 }
 
                 const headers = {
@@ -82,8 +87,8 @@ const Home = ({ route }) => {
 
                 const response = await axios.post(API_URL, {
                     rad: 1000,
-                    lat: location.coords.latitude,
-                    lng: location.coords.longitude,
+                    lat: coords.latitude,
+                    lng: coords.longitude,
                 });
 
                 console.log(response);
@@ -101,21 +106,42 @@ const Home = ({ route }) => {
     const getLocation =  async () => {
         setLoading(true)
         const res = await requestLocationPermission();
-        console.log('res is:', res);
-            if (res) {
+
+        if(res){
+            return new Promise((resolve, reject) => {
                 Geolocation.getCurrentPosition(
                     position => {
-                        console.log(position);
+                        const coords = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                        };
                         setLocation(position);
+                        resolve(coords);
                     },
                     error => {
-                        console.log(error.code, error.message);
                         setLocation(false);
+                        reject(error);
                     },
-                    { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
+                    { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
                 );
-            }
-        console.log(location);
+            });
+        }
+        // console.log('res is:', res);
+        //     if (res) {
+        //         // console.log("starteddd");
+        //         await Geolocation.getCurrentPosition(
+        //             position => {
+        //                 console.log(position);
+        //                 setLocation(position);
+        //             },
+        //             error => {
+        //                 console.log(error.code, error.message);
+        //                 setLocation(false);
+        //             },
+        //             { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
+        //         );
+        //     }
+        // console.log(location);
     };
     return (
         <View style={styles.container}>
