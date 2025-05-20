@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React from 'react';
-import { View, Text, TextInput, Button, StyleSheet} from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity} from 'react-native';
 import { useState } from 'react';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
@@ -9,36 +9,31 @@ import { setCredentials } from '../redux/auth'
 
 const LoginScreen = ({ navigation }) => {
 
-    const dispatch = useDispatch();
-    const loginUrl = 'http://34.220.144.31:8000/login';
+    const signupUrl = 'http://34.220.144.31:8000/login/';
 
     const [username, setUserName] = useState('');
     const [password, setPassword] = useState('');
 
     const login = async () => {
-      console.log("clickeddd");
-        try {
+      console.log('➡️ hitting', signupUrl);                 // ① see real URL
+      try {
+        const { data, status, config } = await axios.post(
+          signupUrl,
+          { username, password },
+          { headers: { 'Content-Type': 'application/json' } }
+        );
+        console.log('✅', status, data);
+        navigation.replace('Details', { token: data.token }); //changed this from Home to Details
 
-            const body = {
-                username,
-                password,
-            }
-            console.log("<<<<<")
-            const resp = await axios.post(loginUrl, body);
-            console.log("11111111")
-            Toast.show({
-                type: "success",
-                text1: "Logged in successfully",
-                // text2: "Please login now",
-            })
-            console.log(resp);
-            const token = resp?.data?.token || null;
-            dispatch(setCredentials({ token: token, user: username }));
-            navigation.replace('Home');
-        } catch (error) {
-            console.log(error);
+      } catch (err) {
+        if (err.response) {
+          console.log('❌ SERVER', err.response.status, err.response.data);
+          console.log('❌ URL', err.config.url);             // ② confirm path/slash
+        } else {
+          console.log('❌ NETWORK', err.message);
         }
-    }
+      }
+    };
     return (
        <View style={styles.container}>
       <Text style={styles.heading}>Login</Text>
@@ -60,9 +55,12 @@ const LoginScreen = ({ navigation }) => {
         style={styles.input}
       />
 
-      <View style={styles.buttonContainer}>
-        <Button title="Log" onPress={login} color="#000" />
-      </View>
+      {/* <View style={styles.buttonContainer}> */}
+      <TouchableOpacity style={styles.buttonContainer} onPress={login}>
+        <Text style={{color: 'black'}}>Login</Text>
+      </TouchableOpacity>
+        <Button title="Login" onPress={login} color="#000" />
+      {/* </View> */}
 
       <Text onPress={() => navigation.navigate('Signup')} style={styles.link}>
         Don't have an account? Sign up
@@ -97,10 +95,13 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
   },
   buttonContainer: {
-    backgroundColor: 'White',
+    backgroundColor: 'white',
     borderRadius: 10,
     borderColor: '#fff',
-    overflow: 'hidden',
+    alignSelf: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 10
+    // overflow: 'hidden',
   },
   link: {
     color: '#ccc',
