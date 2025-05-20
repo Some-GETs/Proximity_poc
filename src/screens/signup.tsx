@@ -4,11 +4,15 @@ import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { useState } from 'react';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
+import { useDispatch } from 'react-redux';
+import { setCredentials } from '../redux/auth';
 
 
 const SignupScreen = ({ navigation }) => {
 
     const signupUrl = 'http://34.220.144.31:8000/signup'
+
+    const dispatch = useDispatch();
 
     const [username, setUserName] = useState('');
     const [password, setPassword] = useState('');
@@ -22,10 +26,11 @@ const SignupScreen = ({ navigation }) => {
             Toast.show({
                 type: "success",
                 text1: "User Registered",
-                text2: "Please login now",
+                text2: "Logged in successfully",
             })
-            console.log(resp, "respppp");
-            navigation.replace('Login')
+            const token = resp?.data?.token || null;
+            dispatch(setCredentials({ token: token, user: username }));
+            navigation.replace('Onboard');
 
         } catch (error) {
             console.log(error);

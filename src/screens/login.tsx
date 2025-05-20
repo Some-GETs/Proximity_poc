@@ -4,20 +4,28 @@ import { View, Text, TextInput, Button, StyleSheet} from 'react-native';
 import { useState } from 'react';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
+import { useDispatch } from 'react-redux';
+import { setCredentials } from '../redux/auth'
 
 const LoginScreen = ({ navigation }) => {
 
-    const signupUrl = 'http://34.220.144.31:8000/login';
+    const dispatch = useDispatch();
+    const loginUrl = 'http://34.220.144.31:8000/login';
 
     const [username, setUserName] = useState('');
     const [password, setPassword] = useState('');
+
     const login = async () => {
+      console.log("clickeddd");
         try {
+
             const body = {
                 username,
                 password,
             }
-            const resp = await axios.post(signupUrl, body);
+            console.log("<<<<<")
+            const resp = await axios.post(loginUrl, body);
+            console.log("11111111")
             Toast.show({
                 type: "success",
                 text1: "Logged in successfully",
@@ -25,7 +33,8 @@ const LoginScreen = ({ navigation }) => {
             })
             console.log(resp);
             const token = resp?.data?.token || null;
-            navigation.replace('Home', {token: token})
+            dispatch(setCredentials({ token: token, user: username }));
+            navigation.replace('Home');
         } catch (error) {
             console.log(error);
         }
@@ -52,7 +61,7 @@ const LoginScreen = ({ navigation }) => {
       />
 
       <View style={styles.buttonContainer}>
-        <Button title="Login" onPress={login} color="#000" />
+        <Button title="Log" onPress={login} color="#000" />
       </View>
 
       <Text onPress={() => navigation.navigate('Signup')} style={styles.link}>
