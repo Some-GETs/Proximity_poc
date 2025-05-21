@@ -13,10 +13,14 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setCredentials: (state, action) => {
+
+      
       const { token, user } = action.payload;
       state.token = token;
       state.user = user;
       state.isAuthenticated = true;
+
+      console.log(state.token+" "+token);
       // Persist token to AsyncStorage
       AsyncStorage.setItem('token', token);
     },

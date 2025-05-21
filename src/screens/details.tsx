@@ -29,6 +29,8 @@ const Details = ({navigation}) => {
     console.log('Instagram:', instagram);
     console.log('LinkedIn:', linkedin);
     console.log('Twitter:', twitter);
+
+    navigation.navigate('Home');
   };
 
   return (

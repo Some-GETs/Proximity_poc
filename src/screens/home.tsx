@@ -65,9 +65,9 @@ const requestLocationPermission = async () => {
   return false;
 };
 
-const Home = ({ route }) => {
+const Home = () => {
   // Get token from route params
-  const { token } = useSelector((state)=> state.auth.token);
+  const token = useSelector((state)=> state.auth.token);
   console.log(token);
   
   // State variables
@@ -92,21 +92,22 @@ const Home = ({ route }) => {
       setLoading(true);
       
       // If we don't have location yet, try to get it
-      if (!location) {
-        await getLocation();
-      }
+      
+      const coords = await getLocation();
+      
+      console.log(`coords ${coords}`)
       
       // If we still don't have location, show an error
-      if (!location) {
-        Alert.alert('Error', 'Unable to get your location. Please check your permissions and try again.');
-        setLoading(false);
-        return;
-      }
+    //   if (!location) {
+    //     Alert.alert('Error', 'Unable to get your location. Please check your permissions and try again.');
+    //     setLoading(false);
+    //     return;
+    //   }
   
       // Prepare request data
       const body = {
-        lat: location.coords.latitude,
-        lng: location.coords.longitude,
+        lat: coords.latitude,
+        lng: coords.longitude,
       };
       
       const headers = {
@@ -140,9 +141,9 @@ const Home = ({ route }) => {
       const usersResponse = await axios.post(
         FETCH_USERS_ENDPOINT,
         {
-          rad: 1000,
-          lat: location.coords.latitude,
-          lng: location.coords.longitude,
+          rad: 0.02,
+          lat: coords.latitude,
+          lng: coords.longitude,
         }
       );
       
@@ -218,8 +219,12 @@ const Home = ({ route }) => {
         Geolocation.getCurrentPosition(
           position => {
             console.log('Position received:', position);
+            const coords = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+            }
             setLocation(position);
-            resolve(position);
+            resolve(coords);
           },
           error => {
             console.log('Geolocation error:', error.code, error.message);
@@ -228,8 +233,8 @@ const Home = ({ route }) => {
           },
           { 
             enableHighAccuracy: true, 
-            timeout: 15000, 
-            maximumAge: 10000 
+            timeout: 10000, 
+            maximumAge: 0 
           }
         );
       });
@@ -257,7 +262,7 @@ const Home = ({ route }) => {
         <Text style={styles.locationStyle}>
           {location
             ? `${location.coords.latitude.toFixed(6)}, ${location.coords.longitude.toFixed(6)}`
-            : 'Location not available'}
+            : 'Fetching your location...'}
         </Text>
       </View>
       

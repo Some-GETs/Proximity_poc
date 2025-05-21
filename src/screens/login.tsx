@@ -8,6 +8,7 @@ import { useDispatch } from 'react-redux';
 import { setCredentials } from '../redux/auth'
 
 const LoginScreen = ({ navigation }) => {
+    const dispatch = useDispatch();
 
     const signupUrl = 'http://34.220.144.31:8000/login/';
 
@@ -22,8 +23,11 @@ const LoginScreen = ({ navigation }) => {
           { username, password },
           { headers: { 'Content-Type': 'application/json' } }
         );
+        const token = data?.token;
+        console.log(token)
         console.log('✅', status, data);
-        navigation.replace('Details', { token: data.token }); //changed this from Home to Details
+        dispatch(setCredentials({token: token, user: username}));
+        navigation.replace('Home'); //changed this from Home to Details
 
       } catch (err) {
         if (err.response) {

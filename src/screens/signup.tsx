@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
     },
     buttonContainer: {
-        backgroundColor: 'White',
+        backgroundColor: 'white',
         borderRadius: 10,
         borderColor: '#fff',
         overflow: 'hidden',
