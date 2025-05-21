@@ -10,7 +10,7 @@ import { setCredentials } from '../redux/auth';
 
 const SignupScreen = ({ navigation }) => {
 
-    const signupUrl = 'http://34.220.144.31:8000/signup'
+    const signupUrl = 'http://34.220.144.31:8000/signup/'
 
     const dispatch = useDispatch();
 
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
     },
     buttonContainer: {
-        backgroundColor: 'White',
+        backgroundColor: 'white',
         borderRadius: 10,
         borderColor: '#fff',
         overflow: 'hidden',
