@@ -1,7 +1,7 @@
 // components/SocialInputRow.js
 
 import React from 'react';
-import {View, TextInput, StyleSheet} from 'react-native';
+import {View, TextInput, StyleSheet, Image} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const SocialInputRow = ({
@@ -13,7 +13,8 @@ const SocialInputRow = ({
 }) => {
   return (
     <View style={styles.row}>
-      <Icon name={icon} size={24} color={iconColor} style={styles.icon} />
+      {/* <Icon name={icon} size={24} color={iconColor} style={styles.icon} /> */}
+      <Image source={icon} style={styles.icon} />
       <TextInput
         style={styles.input}
         placeholder={placeholder}
@@ -34,6 +35,8 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 10,
+    width: 24,
+    height: 24,
   },
   input: {
     flex: 1,
