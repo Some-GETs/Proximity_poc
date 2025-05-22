@@ -127,8 +127,7 @@ const UserInfoScreen = () => {
       console.log(error);
       setLoading(false);
     }
-    setLoading(false);
-    console.log(`loading: ${loading}`);
+  setLoading(false);
   };
 
   useEffect(() => {
@@ -148,7 +147,7 @@ const UserInfoScreen = () => {
       ) : (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <ScrollView
-            style={{flex: 1, marginBottom: keyboardOffset * 0.5}}
+            style={{flex: 1, marginBottom: Platform.OS=='ios'?0: keyboardOffset * 0.15}}
             contentContainerStyle={styles.container}
             keyboardShouldPersistTaps="handled"
             automaticallyAdjustKeyboardInsets={true}>
