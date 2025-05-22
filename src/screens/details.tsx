@@ -50,7 +50,7 @@ const Details = ({navigation}) => {
 
             const resp = await axios.post(apiUrl,body,{headers});
             console.log(resp);
-            navigation.navigate('Home');
+            navigation.navigate('Home')
         }catch(error){
             console.log(error);
         }

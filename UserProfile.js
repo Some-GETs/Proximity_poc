@@ -127,8 +127,7 @@ const UserInfoScreen = () => {
       console.log(error);
       setLoading(false);
     }
-    setLoading(false);
-    console.log(`loading: ${loading}`);
+  setLoading(false);
   };
 
   useEffect(() => {

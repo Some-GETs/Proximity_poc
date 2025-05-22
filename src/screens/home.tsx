@@ -1,6 +1,7 @@
 // @ts-nocheck
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
+import UserCards from './user_card';
 import {
   StyleSheet,
   ScrollView,
@@ -77,6 +78,7 @@ const Home = ({navigation}) => {
   const [location, setLocation] = useState(null);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [activeUser, setActiveUser] = useState("")
   const [permissionGranted, setPermissionGranted] = useState(false);
   const [activeUser,setActiveUser] = useState("");
 
@@ -266,6 +268,7 @@ const Home = ({navigation}) => {
         </Text>
       </View>
     </View>
+
 {loading ? (
   <View style={styles.loadingContainer}>
     <ActivityIndicator size="large" color="#0000ff" />
@@ -274,58 +277,13 @@ const Home = ({navigation}) => {
 ) : users ? (
   users.length > 0 ? (
     <>
-      <Text style={styles.userHeader}>Nearby Active Users</Text>
+      
       <ScrollView
         scrollEnabled={true}
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}>
-        {users.map((item, index) => (
-
-                   <TouchableOpacity
-                       key={index}
-                       style={styles.userCard}
-                       onPress={() => setActiveUser(item.name)}
-                       activeOpacity={0.8}
-                   >
-                       <Text style={styles.userName}>{item.name}</Text>
-                       <Text style={styles.userDist}>{`${item.distance}m away`}</Text>
-                        {console.log("yha par user dikhenge")}
-                        {console.log(activeUser)}
-                        {console.log(item.metadata)}
-                        
-                         {activeUser === item.name && item.metadata && (
-                           <View style={styles.metadataContainer}>
-                               {item.metadata.mobile_no && (
-                                   <Text style={styles.userDist}>Mobile_no: {item.metadata.mobile_no}</Text>
-                               )}
-                                {item.metadata.email_id && (
-                                    <Text style={styles.userDist}>Email_id: {item.metadata.email_id}</Text>
-                                )}
-                                {item.metadata.gender && (
-                                    <Text style={styles.userDist}>Gender: {item.metadata.gender}</Text>
-                                )}
-                                {item.metadata.age && (
-                                    <Text style={styles.userDist}>Age: {item.metadata.age}</Text>
-                                )}
-                                {item.metadata.social_media.instagram_username && (
-                                    <Text style={styles.userDist}>Instagram_username: {item.metadata.social_media.instagram_username}</Text>
-                                )}
-                                {item.metadata.social_media.linkedin_username && (
-                                    <Text style={styles.userDist}>Linkedin_username: {item.metadata.social_media.linkedin_username}</Text>
-                                )}
-                                {item.metadata.social_media.twitter && (
-                                    <Text style={styles.userDist}>Twitter: {item.metadata.social_media.twitter}</Text>
-                                )}
-                                {item.metadata.pfp_url && (
-                                  <Image
-                                        source={{uri: item.metadata.pfp_url}}
-                                        style={styles.locationIcon}
-                                    />                                
-                                )}
-                           </View>
-                       )}
-                   </TouchableOpacity>
-               ))}
+    
+       <UserCards users={users} /> 
       </ScrollView>
     </>
   ) : (
@@ -351,12 +309,15 @@ const Home = ({navigation}) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f1f3f8',
-    paddingTop: 40,
-    paddingHorizontal: 20,
-  },
+    
+  
+    container: {
+        flex: 1,
+        backgroundColor: '#f4f6fa',
+        alignItems: 'center',
+        paddingTop: 40,
+        paddingBottom: 20,
+    },
 
   topBar: {
     flexDirection: 'row',
