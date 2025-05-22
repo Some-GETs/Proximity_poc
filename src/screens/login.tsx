@@ -8,37 +8,36 @@ import { useDispatch } from 'react-redux';
 import { setCredentials } from '../redux/auth'
 
 const LoginScreen = ({ navigation }) => {
-
     const dispatch = useDispatch();
-    const loginUrl = 'http://34.220.144.31:8000/login';
+
+    const signupUrl = 'http://34.220.144.31:8000/login/';
 
     const [username, setUserName] = useState('');
     const [password, setPassword] = useState('');
 
     const login = async () => {
-      console.log("clickeddd");
-        try {
+      console.log('➡️ hitting', signupUrl);                 // ① see real URL
+      try {
+        const { data, status, config } = await axios.post(
+          signupUrl,
+          { username, password },
+          { headers: { 'Content-Type': 'application/json' } }
+        );
+        const token = data?.token;
+        console.log(token)
+        console.log('✅', status, data);
+        dispatch(setCredentials({token: token, user: username}));
+        navigation.replace('Home'); //changed this from Home to Details
 
-            const body = {
-                username,
-                password,
-            }
-            console.log("<<<<<")
-            const resp = await axios.post(loginUrl, body);
-            console.log("11111111")
-            Toast.show({
-                type: "success",
-                text1: "Logged in successfully",
-                // text2: "Please login now",
-            })
-            console.log(resp);
-            const token = resp?.data?.token || null;
-            dispatch(setCredentials({ token: token, user: username }));
-            navigation.replace('Home');
-        } catch (error) {
-            console.log(error);
+      } catch (err) {
+        if (err.response) {
+          console.log('❌ SERVER', err.response.status, err.response.data);
+          console.log('❌ URL', err.config.url);             // ② confirm path/slash
+        } else {
+          console.log('❌ NETWORK', err.message);
         }
     }
+  }
 return (
   <View style={styles.container}>
     <Text style={styles.heading}>Welcome Back 👋</Text>
@@ -71,6 +70,7 @@ return (
 );
 
 };
+
 
 const styles = StyleSheet.create({
   container: {

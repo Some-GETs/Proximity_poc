@@ -109,7 +109,8 @@ const ImagePickerComponent = ({initialPhotoUrl}) => {
       setIsUploadAllowed(false);
       console.log(res.data);
     } catch (error) {
-      console.log(error);
+      ;
+      console.log("erroroor"+" "+JSON.stringify(error.response.data));
     }
   };
   useEffect(() => {

@@ -1,25 +1,28 @@
 // @ts-nocheck
 import axios from 'axios';
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   ScrollView,
   View,
   Text,
+  Platform,
   PermissionsAndroid,
   TouchableOpacity,
   Image,
-  Button,
+  Alert,
 } from 'react-native';
 import {useSelector} from 'react-redux';
 import Geolocation from 'react-native-geolocation-service';
 
-const API_URL = 'http://34.220.144.31:8000/fetch-users-mg';
-const API_URL2 = 'http://34.220.144.31:8000/update-location';
+// const API_URL = 'http://34.220.144.31:8000/fetch-users-mg/';
+// const API_URL2 = 'http://34.220.144.31:8000/update-location2/';
+const API_BASE_URL = 'http://34.220.144.31:8000';
+const UPDATE_LOCATION_ENDPOINT = `${API_BASE_URL}/update-location/`;
+const FETCH_USERS_ENDPOINT = `${API_BASE_URL}/fetch-users-mg/`;
 
-const AUTH_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJpYXQiOjE3NDc4MTc4NzYsImV4cCI6MTc0NzgyMTQ3Nn0.U1hyEFPhxFyGeNCDMo9Xph7o4IBaih3zDNxKAijxOdg"
-// Function to get permission for location
-const requestLocationPermission = async () => {
+// Function to get permission for location on Android
+const requestAndroidLocationPermission = async () => {
   try {
     const granted = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
@@ -31,8 +34,8 @@ const requestLocationPermission = async () => {
         buttonPositive: 'OK',
       },
     );
-    console.log('granted', granted);
-    if (granted === 'granted') {
+    
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
       console.log('You can use Geolocation');
       return true;
     } else {
@@ -40,110 +43,211 @@ const requestLocationPermission = async () => {
       return false;
     }
   } catch (err) {
+    console.error('Error requesting Android location permission:', err);
     return false;
   }
 };
 
-const Home = ({navigation}) => {
-    // state to hold location
-    const token = useSelector((state) => state.auth.token);
-    console.log(token);
-    // const { token } = route.params;
-    // console.log("tokennnn", route.params);
-    // const AUTH_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJpYXQiOjE3NDc2MzUyMTEsImV4cCI6MTc0NzYzODgxMX0.5tcFnPLLCQln5b6giay8SBfKek8ct4cJIrAk5K2TStQ";
-    // console.log(AUTH_TOKEN);
-    const [location, setLocation] = useState(false);
-    const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(false);
-
-    const sendLocation = async () => {
-        const coords = await getLocation();
-        try {
-            if (coords) {
-
-        const body = {
-          lat: coords.latitude,
-          lng: coords.longitude,
-        };
-
-        const headers = {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        };
-
-        console.log(token);
-        // console.log(headers);
-        // console.log(body, "bodyyy");
-        const updateLoc = await axios.post(API_URL2, body, {
-          headers,
-        });
-
-        console.log(updateLoc);
-
-        const response = await axios.post(API_URL, {
-          rad: 1000,
-          lat: coords.latitude,
-          lng: coords.longitude,
-        });
-
-        console.log(response);
-        setUsers(response.data);
-        console.log('Success:');
-      } else {
-        console.log('error');
-      }
+// Platform-independent permission request
+const requestLocationPermission = async () => {
+  if (Platform.OS === 'ios') {
+    try {
+      const auth = await Geolocation.requestAuthorization('whenInUse');
+      console.log('iOS permission status:', auth);
+      return auth === 'granted';
     } catch (error) {
-      console.error('Error sending API request:', error);
+      console.error('Error requesting iOS location permission:', error);
+      return false;
+    }
+  } else if (Platform.OS === 'android') {
+    return await requestAndroidLocationPermission();
+  }
+  return false;
+};
+
+const Home = ({navigation}) => {
+  // Get token from route params
+  const token = useSelector((state)=> state.auth.token);
+  console.log(token);
+  
+  // State variables
+  const [location, setLocation] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [permissionGranted, setPermissionGranted] = useState(false);
+
+  // Check for permission on component mount
+  useEffect(() => {
+    (async () => {
+      const hasPermission = await requestLocationPermission();
+      setPermissionGranted(hasPermission);
+      if (hasPermission) {
+        getLocation();
+      }
+    })();
+  }, []);
+
+  const sendLocation = async () => {
+    try {
+      setLoading(true);
+      
+      // If we don't have location yet, try to get it
+      
+      const coords = await getLocation();
+      
+      console.log(`coords ${coords}`)
+      
+      // If we still don't have location, show an error
+    //   if (!location) {
+    //     Alert.alert('Error', 'Unable to get your location. Please check your permissions and try again.');
+    //     setLoading(false);
+    //     return;
+    //   }
+  
+      // Prepare request data
+      const body = {
+        lat: coords.latitude,
+        lng: coords.longitude,
+      };
+      
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      };
+  
+      console.log('Making API request to:', UPDATE_LOCATION_ENDPOINT);
+      console.log('With body:', JSON.stringify(body));
+      console.log('And headers:', JSON.stringify(headers));
+      
+      // Try ping the server first to see if it's reachable
+    //   try {
+    //     const pingResponse = await axios.get(`${API_BASE_URL}/`);
+    //     console.log('Server ping response:', pingResponse.status);
+    //   } catch (pingError) {
+    //     console.log('Server ping failed:', pingError);
+    //     // Continue anyway - the ping endpoint might not exist
+    //   }
+      
+      // Update user's location
+      const updateResponse = await axios.post(
+        UPDATE_LOCATION_ENDPOINT,
+        body,
+        { headers }
+      );
+      
+      console.log('Location update response:', updateResponse.data);
+      
+      const usersResponse = await axios.post(
+        FETCH_USERS_ENDPOINT,
+        {
+          rad: 0.02,
+          lat: coords.latitude,
+          lng: coords.longitude,
+        }
+      );
+      
+      console.log('Fetched users:', usersResponse.data);
+      setUsers(usersResponse.data);
+      
+    } catch (error) {
+      console.error('Error in sendLocation:', error);
+      
+      // More detailed error logging
+      if (axios.isAxiosError(error)) {
+        console.log('API error details:');
+        console.log('- Status:', error.response?.status);
+        console.log('- Status text:', error.response?.statusText);
+        console.log('- URL:', error.config?.url);
+        console.log('- Method:', error.config?.method);
+        console.log('- Headers:', JSON.stringify(error.config?.headers));
+        console.log('- Data:', error.response?.data);
+        
+        // Suggest specific fixes based on error status
+        if (error.response?.status === 404) {
+          Alert.alert(
+            'API Endpoint Not Found', 
+            'The server endpoint could not be found. Please check the API URL or contact support.'
+          );
+        } else if (error.response?.status === 401) {
+          Alert.alert(
+            'Authentication Error', 
+            'Your session may have expired. Please log in again.'
+          );
+        } else if (error.response?.status === 403) {
+          Alert.alert(
+            'Permission Denied', 
+            'You do not have permission to perform this action.'
+          );
+        } else {
+          Alert.alert(
+            'Network Error', 
+            `Failed to connect to the server. Please check your internet connection and try again. Error: ${error.message}`
+          );
+        }
+      } else {
+        Alert.alert(
+          'Error', 
+          'An unexpected error occurred. Please try again later.'
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Function to get location
+  const getLocation = async () => {
+    try {
+      if (!permissionGranted) {
+        const hasPermission = await requestLocationPermission();
+        setPermissionGranted(hasPermission);
+        
+        if (!hasPermission) {
+          Alert.alert(
+            'Permission Required',
+            'Location permission is required to use this feature.',
+            [
+              { text: 'OK' }
+            ]
+          );
+          return;
+        }
+      }
+      
+      return new Promise((resolve, reject) => {
+        Geolocation.getCurrentPosition(
+          position => {
+            console.log('Position received:', position);
+            const coords = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+            }
+            setLocation(position);
+            resolve(coords);
+          },
+          error => {
+            console.log('Geolocation error:', error.code, error.message);
+            setLocation(null);
+            reject(error);
+          },
+          { 
+            enableHighAccuracy: true, 
+            timeout: 10000, 
+            maximumAge: 0 
+          }
+        );
+      });
+    } catch (error) {
+      console.error('Error in getLocation:', error);
+      return null;
     }
   };
 
   const handleAbout = () => {
     navigation.navigate('Account');
   }
-  // function to check permissions and get Location
 
-    // function to check permissions and get Location
-    const getLocation =  async () => {
-        setLoading(true)
-        const res = await requestLocationPermission();
-
-        if(res){
-            return new Promise((resolve, reject) => {
-                Geolocation.getCurrentPosition(
-                    position => {
-                        const coords = {
-                            latitude: position.coords.latitude,
-                            longitude: position.coords.longitude,
-                        };
-                        setLocation(position);
-                        resolve(coords);
-                    },
-                    error => {
-                        setLocation(false);
-                        reject(error);
-                    },
-                    { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-                );
-            });
-        }
-        // console.log('res is:', res);
-        //     if (res) {
-        //         // console.log("starteddd");
-        //         await Geolocation.getCurrentPosition(
-        //             position => {
-        //                 console.log(position);
-        //                 setLocation(position);
-        //             },
-        //             error => {
-        //                 console.log(error.code, error.message);
-        //                 setLocation(false);
-        //             },
-        //             { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
-        //         );
-        //     }
-        // console.log(location);
-    };
-    return (
+   return (
     <View style={styles.container}>
 
         
@@ -195,9 +299,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingTop: 40,
         paddingBottom: 20,
-    },
-    aboutIcon:{
-        margin: '200'
     },
 
     locationContainer: {
