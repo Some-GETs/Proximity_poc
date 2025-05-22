@@ -1,72 +1,80 @@
 // @ts-nocheck
 import React from 'react';
-import { View, Text, TextInput, Button, StyleSheet,TouchableOpacity } from 'react-native';
-import { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native';
+import {useState} from 'react';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
-import { useDispatch } from 'react-redux';
-import { setCredentials } from '../redux/auth';
+import {useDispatch} from 'react-redux';
+import {setCredentials} from '../redux/auth';
 
+const SignupScreen = ({navigation}) => {
+  const signupUrl = 'http://34.220.144.31:8000/signup/';
 
-const SignupScreen = ({ navigation }) => {
+  const dispatch = useDispatch();
 
-    const signupUrl = 'http://34.220.144.31:8000/signup/'
-
-    const dispatch = useDispatch();
-
-    const [username, setUserName] = useState('');
-    const [password, setPassword] = useState('');
-    const register = async () => {
-        try {
-            const body = {
-                username,
-                password,
-            }
-            const resp = await axios.post(signupUrl, body);
-            Toast.show({
-                type: "success",
-                text1: "User Registered",
-                text2: "Logged in successfully",
-            })
-            const token = resp?.data?.token || null;
-            dispatch(setCredentials({ token: token, user: username }));
-            navigation.replace('Onboard');
-
-        } catch (error) {
-            console.log(error);
-        }
+  const [username, setUserName] = useState('');
+  const [password, setPassword] = useState('');
+  const register = async () => {
+    try {
+      const body = {
+        username,
+        password,
+      };
+      const resp = await axios.post(signupUrl, body);
+      Toast.show({
+        type: 'success',
+        text1: 'User Registered',
+        text2: 'Logged in successfully',
+      });
+      const token = resp?.data?.token || null;
+      dispatch(setCredentials({token: token, user: username}));
+      navigation.replace('Onboard');
+    } catch (error) {
+      console.log(error);
     }
+  };
 
-    return (
-       <View style={styles.container}>
-  <Text style={styles.heading}>Create Account ✨</Text>
+  return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <Text style={styles.heading}>Create Account ✨</Text>
 
-  <TextInput
-    placeholder="Username"
-    placeholderTextColor="#aaa"
-    value={username}
-    onChangeText={text => setUserName(text)}
-    style={styles.input}
-  />
+        <TextInput
+          placeholder="Username"
+          placeholderTextColor="#aaa"
+          value={username}
+          onChangeText={text => setUserName(text)}
+          style={styles.input}
+        />
 
-  <TextInput
-    placeholder="Password"
-    placeholderTextColor="#aaa"
-    value={password}
-    onChangeText={text => setPassword(text)}
-    secureTextEntry
-    style={styles.input}
-  />
+        <TextInput
+          placeholder="Password"
+          placeholderTextColor="#aaa"
+          value={password}
+          onChangeText={text => setPassword(text)}
+          secureTextEntry
+          style={styles.input}
+        />
 
-  <TouchableOpacity style={styles.button} onPress={register}>
-    <Text style={styles.buttonText}>Sign Up</Text>
-  </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={register}>
+          <Text style={styles.buttonText}>Sign Up</Text>
+        </TouchableOpacity>
 
-  <Text onPress={() => navigation.navigate('Login')} style={styles.link}>
-    Have an account? <Text style={styles.linkHighlight}>Log in</Text>
-  </Text>
-</View>
-    );
+        <Text onPress={() => navigation.navigate('Login')} style={styles.link}>
+          Have an account? <Text style={styles.linkHighlight}>Log in</Text>
+        </Text>
+      </View>
+    </TouchableWithoutFeedback>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -94,7 +102,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#333',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 4,
@@ -105,7 +113,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     shadowColor: '#6c5ce7',
-    shadowOffset: { width: 0, height: 3 },
+    shadowOffset: {width: 0, height: 3},
     shadowOpacity: 0.4,
     shadowRadius: 6,
     elevation: 5,
@@ -126,6 +134,5 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
 });
-
 
 export default SignupScreen;

@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -8,115 +8,119 @@ import {
   StyleSheet,
   SafeAreaView,
   Alert,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
-import { useDispatch, useSelector} from 'react-redux';
-import { setDetails } from '../redux/detail';
+import {useDispatch, useSelector} from 'react-redux';
+import {setDetails} from '../redux/detail';
 import axios from 'axios';
 
 const Details = ({navigation}) => {
   const [instagram, setInstagram] = useState('');
   const [linkedin, setLinkedin] = useState('');
   const [twitter, setTwitter] = useState('');
-  const [fetch,setFetch] = useState(false);
+  const [fetch, setFetch] = useState(false);
 
-  const data = useSelector((state) => state.details)
-  const token = useSelector((state) => state.auth.token);
+  const data = useSelector(state => state.details);
+  const token = useSelector(state => state.auth.token);
   const dispatch = useDispatch();
   console.log(token);
 
-  const apiUrl = "http://34.220.144.31:8000/update-metadata";
+  const apiUrl = 'http://34.220.144.31:8000/update-metadata';
 
   useEffect(() => {
-    if(fetch){
-        fetchData();
+    if (fetch) {
+      fetchData();
     }
 
-    async function fetchData(){
-        const body = {
-            email_id: data.email,
-            mobile_no: data.mobileNo,
-            social_media:{
-                instagram_username: data.instagram,
-                linkedin_username: data.linkedin,
-                twitter: data.twitter
-            }
-        }
-        const headers = {
-            Authorization: `Bearer ${token}`
-        }
-        try{
-
-            const resp = await axios.post(apiUrl,body,{headers});
-            console.log(resp);
-        }catch(error){
-            console.log(error);
-        }
+    async function fetchData() {
+      const body = {
+        email_id: data.email,
+        mobile_no: data.mobileNo,
+        social_media: {
+          instagram_username: data.instagram,
+          linkedin_username: data.linkedin,
+          twitter: data.twitter,
+        },
+      };
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      try {
+        const resp = await axios.post(apiUrl, body, {headers});
         console.log(resp);
+      } catch (error) {
+        console.log(error);
+      }
+      console.log(resp);
     }
-  },[fetch])
+  }, [fetch]);
   const handleSkip = () => {
-    if(instagram || linkedin || twitter){
-        Alert.alert("Please press next");
-        return;
+    if (instagram || linkedin || twitter) {
+      Alert.alert('Please press next');
+      return;
     }
-    
+
     console.log('User chose to skip entering social media details.');
-    navigation.navigate('Home')
+    navigation.navigate('Home');
   };
 
   const handleNext = async () => {
-    await dispatch(setDetails({
+    await dispatch(
+      setDetails({
         ...data,
         instagram: instagram,
         twitter: twitter,
         linkedIn: linkedin,
-    }));
+      }),
+    );
 
     setFetch(true);
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-  <Text style={styles.title}>Social Media Details</Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.title}>Social Media Details</Text>
 
-  <TextInput
-    style={styles.input}
-    placeholder="Instagram Handle"
-    placeholderTextColor="#aaa"
-    value={instagram}
-    onChangeText={setInstagram}
-    autoCapitalize="none"
-  />
+        <TextInput
+          style={styles.input}
+          placeholder="Instagram Handle"
+          placeholderTextColor="#aaa"
+          value={instagram}
+          onChangeText={setInstagram}
+          autoCapitalize="none"
+        />
 
-  <TextInput
-    style={styles.input}
-    placeholder="LinkedIn Profile"
-    placeholderTextColor="#aaa"
-    value={linkedin}
-    onChangeText={setLinkedin}
-    autoCapitalize="none"
-  />
+        <TextInput
+          style={styles.input}
+          placeholder="LinkedIn Profile"
+          placeholderTextColor="#aaa"
+          value={linkedin}
+          onChangeText={setLinkedin}
+          autoCapitalize="none"
+        />
 
-  <TextInput
-    style={styles.input}
-    placeholder="Twitter Handle"
-    placeholderTextColor="#aaa"
-    value={twitter}
-    onChangeText={setTwitter}
-    autoCapitalize="none"
-  />
+        <TextInput
+          style={styles.input}
+          placeholder="Twitter Handle"
+          placeholderTextColor="#aaa"
+          value={twitter}
+          onChangeText={setTwitter}
+          autoCapitalize="none"
+        />
 
-  <View style={styles.buttonContainer}>
-    <TouchableOpacity style={styles.buttonOutline} onPress={handleSkip}>
-      <Text style={styles.buttonOutlineText}>Skip</Text>
-    </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.buttonOutline} onPress={handleSkip}>
+            <Text style={styles.buttonOutlineText}>Skip</Text>
+          </TouchableOpacity>
 
-    <TouchableOpacity style={styles.buttonFilled} onPress={handleNext}>
-      <Text style={styles.buttonFilledText}>Next</Text>
-    </TouchableOpacity>
-  </View>
-</SafeAreaView>
-
+          <TouchableOpacity style={styles.buttonFilled} onPress={handleNext}>
+            <Text style={styles.buttonFilledText}>Next</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 };
 const styles = StyleSheet.create({
@@ -144,7 +148,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#333',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
+    shadowOffset: {width: 0, height: 3},
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
@@ -172,7 +176,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     alignItems: 'center',
     shadowColor: '#6c5ce7',
-    shadowOffset: { width: 0, height: 3 },
+    shadowOffset: {width: 0, height: 3},
     shadowOpacity: 0.3,
     shadowRadius: 6,
     elevation: 5,
@@ -188,6 +192,5 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-
 
 export default Details;
