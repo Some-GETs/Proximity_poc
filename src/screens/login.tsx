@@ -32,9 +32,17 @@ const LoginScreen = ({ navigation }) => {
       } catch (err) {
         if (err.response) {
           console.log('❌ SERVER', err.response.status, err.response.data);
+          Toast.show({
+                          type: 'error',
+                          text1: "Usename and Password do not match",
+                      })
           console.log('❌ URL', err.config.url);             // ② confirm path/slash
         } else {
           console.log('❌ NETWORK', err.message);
+          Toast.show({
+                          type: 'error',
+                          text1: "Network error",
+                      })
         }
     }
   }

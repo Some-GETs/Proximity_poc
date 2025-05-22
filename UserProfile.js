@@ -76,19 +76,23 @@ const UserInfoScreen = () => {
         headers,
       });
       console.log(res.data.metadata);
-      setInstagram(res.data.metadata.social_media.instagram_username);
-      setLinkedIn(res.data.metadata.social_media.linkedin_username);
-      setTwitter(res.data.metadata.social_media.twitter);
+      if(!res.data.metadata){
+        setLoading(false);
+        console.log(loading,"loadingggg");
+      }
 
-      setUsername(res.data.metadata.username);
-      setMobile(res.data.metadata.mobile_no);
-      setImage(res.data.metadata.pfp_url);
-      setMobile(res.data.metadata.mobile_no);
-      setAge(res.data.metadata.age.toString());
-      setEmail(res.data.metadata.email_id);
-      setFullName(res.data.metadata.full_name);
-      setProfession(res.data.metadata.profession);
-      setGender(res.data.metadata.gender);
+      console.log("after loading falseee");
+      setInstagram(res?.data?.metadata?.social_media?.instagram_username);
+      setLinkedIn(res?.data?.metadata?.social_media?.linkedin_username);
+      setTwitter(res?.data?.metadata?.social_media?.twitter);
+      setUsername(res?.data?.metadata?.username);
+      setMobile(res?.data?.metadata?.mobile_no);
+      setImage(res?.data?.metadata?.pfp_url);
+      setAge(res?.data?.metadata?.age?.toString());
+      setEmail(res?.data?.metadata?.email_id);
+      setFullName(res?.data.metadata?.full_name);
+      setProfession(res?.data?.metadata?.profession);
+      setGender(res?.data?.metadata?.gender);
     } catch {
       console.log(error);
     }

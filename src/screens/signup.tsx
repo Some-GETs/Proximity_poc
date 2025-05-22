@@ -34,6 +34,10 @@ const SignupScreen = ({ navigation }) => {
 
         } catch (error) {
             console.log(error);
+            Toast.show({
+                type: "error",
+                text1: "Try again after sometime!"
+            })
         }
     }
 
