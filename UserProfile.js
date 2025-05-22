@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -33,6 +33,36 @@ const UserInfoScreen = () => {
   const [profession, setProfession] = useState('');
   const [loading, setLoading] = useState(false);
   const [saveDisabled, setSaveDisabled] = useState(true);
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
+  // change offset based on keyboard appearance
+  const onKeyboardShow = event => {
+    console.log(event.endCoordinates.height);
+    setKeyboardOffset(event.endCoordinates.height);
+  };
+  const onKeyboardHide = () => setKeyboardOffset(0);
+  const keyboardDidShowListener = useRef();
+  const keyboardDidHideListener = useRef();
+  // register keyboard appear/disappear events
+  useEffect(() => {
+    const showEvent =
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent =
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    keyboardDidShowListener.current = Keyboard.addListener(
+      showEvent,
+      onKeyboardShow,
+    );
+    keyboardDidHideListener.current = Keyboard.addListener(
+      hideEvent,
+      onKeyboardHide,
+    );
+
+    return () => {
+      keyboardDidShowListener.current.remove();
+      keyboardDidHideListener.current.remove();
+    };
+  }, []);
 
   const handleSave = async () => {
     setLoading(true);
@@ -119,7 +149,7 @@ const UserInfoScreen = () => {
       ) : (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <ScrollView
-            style={{flex: 1}}
+            style={{flex: 1, marginBottom: keyboardOffset * 0.5}}
             contentContainerStyle={styles.container}
             keyboardShouldPersistTaps="handled"
             automaticallyAdjustKeyboardInsets={true}>
