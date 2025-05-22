@@ -82,8 +82,9 @@ const UserCards = ({ users }:any) => {
               ) : (
                 <View style={styles.defaultAvatar}>
                   <Text style={styles.avatarText}>
-                    {/* {user.name.split(' ').map((n:any) => n[0]).join('')} */}
-                    { user.metadata?.full_name ?? user.name}
+                    {user.name.split(' ').map((n:any) => n[0]).join('')}
+                    {/* {console.log(`yeh hai asli metadata ${JSON.stringify(user.metadata)}`)} */}
+                    {/* { user.metadata?.full_name ?? user.name} */}
                   </Text>
                 </View>
               )}
@@ -91,7 +92,7 @@ const UserCards = ({ users }:any) => {
             </View>
             
             <View style={styles.userDetails}>
-              <Text style={styles.userName}>{user.name}</Text>
+              <Text style={styles.userName}>{user.metadata?.full_name ?? user.name}</Text>
               <View style={styles.distanceContainer}>
                 <View style={[styles.locationDot, { backgroundColor: getDistanceColor(user.distance) }]} />
                 <Text style={[styles.userDistance, { color: getDistanceColor(user.distance) }]}>

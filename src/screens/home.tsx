@@ -80,7 +80,7 @@ const Home = ({navigation}) => {
   const [loading, setLoading] = useState(false);
   const [activeUser, setActiveUser] = useState("")
   const [permissionGranted, setPermissionGranted] = useState(false);
-  const [activeUser,setActiveUser] = useState("");
+  
 
   // Check for permission on component mount
   useEffect(() => {
@@ -282,7 +282,7 @@ const Home = ({navigation}) => {
         scrollEnabled={true}
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}>
-    
+        
        <UserCards users={users} /> 
       </ScrollView>
     </>
@@ -314,9 +314,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f4f6fa',
-        alignItems: 'center',
         paddingTop: 40,
         paddingBottom: 20,
+        
     },
 
   topBar: {
@@ -324,6 +324,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 15,
+    marginHorizontal:10
   },
 
   aboutIcon: {
