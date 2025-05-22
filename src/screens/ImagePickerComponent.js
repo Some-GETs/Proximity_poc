@@ -99,6 +99,7 @@ const ImagePickerComponent = ({initialPhotoUrl}) => {
         'Content-Type': 'multipart/form-data',
         Authorization: `Bearer ${token}`,
       };
+
       const res = await axios.post(
         'http://34.220.144.31:8000/upload-pfp/',
         formData,

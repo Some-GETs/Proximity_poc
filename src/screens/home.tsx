@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  ActivityIndicator
 } from 'react-native';
 import {useSelector} from 'react-redux';
 import Geolocation from 'react-native-geolocation-service';
@@ -68,6 +69,8 @@ const requestLocationPermission = async () => {
 const Home = ({navigation}) => {
   // Get token from route params
   const token = useSelector((state)=> state.auth.token);
+  const details = useSelector((state) => state.details);
+  console.log(details);
   console.log(token);
   
   // State variables
@@ -75,6 +78,7 @@ const Home = ({navigation}) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [permissionGranted, setPermissionGranted] = useState(false);
+  const [activeUser,setActiveUser] = useState("");
 
   // Check for permission on component mount
   useEffect(() => {
@@ -248,149 +252,253 @@ const Home = ({navigation}) => {
   }
 
    return (
-    <View style={styles.container}>
-
-        
-        <TouchableOpacity style={styles.aboutIcon} onPress={handleAbout}>
-            <Image
-                source={require('../../account_icon.png')}
-                style={styles.locationIcon}
-            />
-        </TouchableOpacity>
-        <View style={styles.locationContainer}>
-            <Image
-                source={require('../../location_pin.png')}
-                style={styles.locationIcon}
-            />
-            <Text style={styles.locationStyle}>
-                {location
-                    ? `${location.coords.latitude}, ${location.coords.longitude}`
-                    : null}
-            </Text>
-        </View>
-
-        {users && (
-            <>
-                <Text style={styles.userHeader}>Nearby Active Users</Text>
-                <ScrollView
-                    scrollEnabled={true}
-                    style={styles.scrollView}
-                    contentContainerStyle={styles.scrollContent}>
-                    {users.map((item, index) => (
-                        <View key={index} style={styles.userCard}>
-                            <Text style={styles.userName}>{item.name}</Text>
-                            <Text style={styles.userDist}>{`${item.distance}m away`}</Text>
-                        </View>
-                    ))}
-                </ScrollView>
-            </>
-        )}
-
-        <TouchableOpacity style={styles.refreshButton} onPress={sendLocation}>
-            <Text style={styles.refreshBtn}>Refresh Users</Text>
-        </TouchableOpacity>
+  <View style={styles.container}>
+    <View style={styles.topBar}>
+      <TouchableOpacity onPress={handleAbout}>
+        <Image source={require('../../account_icon.png')} style={styles.aboutIcon} />
+      </TouchableOpacity>
+      <View style={styles.locationContainer}>
+        <Image source={require('../../location_pin.png')} style={styles.locationIcon} />
+        <Text style={styles.locationText}>
+          {location
+            ? `${location.coords.latitude.toFixed(3)}, ${location.coords.longitude.toFixed(3)}`
+            : 'Fetching...'}
+        </Text>
+      </View>
     </View>
+{loading ? (
+  <View style={styles.loadingContainer}>
+    <ActivityIndicator size="large" color="#0000ff" />
+    <Text style={styles.loadingText}>Loading...</Text>
+  </View>
+) : users ? (
+  users.length > 0 ? (
+    <>
+      <Text style={styles.userHeader}>Nearby Active Users</Text>
+      <ScrollView
+        scrollEnabled={true}
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}>
+        {users.map((item, index) => (
+
+                   <TouchableOpacity
+                       key={index}
+                       style={styles.userCard}
+                       onPress={() => setActiveUser(item.name)}
+                       activeOpacity={0.8}
+                   >
+                       <Text style={styles.userName}>{item.name}</Text>
+                       <Text style={styles.userDist}>{`${item.distance}m away`}</Text>
+                        {console.log("yha par user dikhenge")}
+                        {console.log(activeUser)}
+                        {console.log(item.metadata)}
+                        
+                         {activeUser === item.name && item.metadata && (
+                           <View style={styles.metadataContainer}>
+                               {item.metadata.mobile_no && (
+                                   <Text style={styles.userDist}>Mobile_no: {item.metadata.mobile_no}</Text>
+                               )}
+                                {item.metadata.email_id && (
+                                    <Text style={styles.userDist}>Email_id: {item.metadata.email_id}</Text>
+                                )}
+                                {item.metadata.gender && (
+                                    <Text style={styles.userDist}>Gender: {item.metadata.gender}</Text>
+                                )}
+                                {item.metadata.age && (
+                                    <Text style={styles.userDist}>Age: {item.metadata.age}</Text>
+                                )}
+                                {item.metadata.social_media.instagram_username && (
+                                    <Text style={styles.userDist}>Instagram_username: {item.metadata.social_media.instagram_username}</Text>
+                                )}
+                                {item.metadata.social_media.linkedin_username && (
+                                    <Text style={styles.userDist}>Linkedin_username: {item.metadata.social_media.linkedin_username}</Text>
+                                )}
+                                {item.metadata.social_media.twitter && (
+                                    <Text style={styles.userDist}>Twitter: {item.metadata.social_media.twitter}</Text>
+                                )}
+                                {item.metadata.pfp_url && (
+                                  <Image
+                                        source={{uri: item.metadata.pfp_url}}
+                                        style={styles.locationIcon}
+                                    />                                
+                                )}
+                           </View>
+                       )}
+                   </TouchableOpacity>
+               ))}
+      </ScrollView>
+    </>
+  ) : (
+    <View style={styles.emptyState}>
+      {/* <Image
+        source={require('../../account_icon.png')}
+        style={styles.emptyImage}
+        resizeMode="contain"
+      /> */}
+      <Text style={styles.emptyText}>Discover users nearby!</Text>
+    </View>
+  )
+) : null}
+ 
+
+    <TouchableOpacity style={styles.refreshButton} onPress={sendLocation}>
+      <Text style={styles.refreshBtn}>Discover</Text>
+    </TouchableOpacity>
+  </View>
+
 );
+
 };
+
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f4f6fa',
-        alignItems: 'center',
-        paddingTop: 40,
-        paddingBottom: 20,
-    },
+  container: {
+    flex: 1,
+    backgroundColor: '#f1f3f8',
+    paddingTop: 40,
+    paddingHorizontal: 20,
+  },
 
-    locationContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        alignSelf: 'flex-start',
-        marginLeft: '10%',
-        marginBottom: 10,
-    },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 15,
+  },
 
-    locationIcon: {
-        width: 28,
-        height: 28,
-        marginRight: 10,
-    },
+  aboutIcon: {
+    width: 32,
+    height: 32,
+  },
 
-    locationStyle: {
-        color: '#333',
-        fontSize: 16,
-        fontWeight: '400',
-    },
+  locationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 3,
+  },
 
-    userHeader: {
-        fontSize: 28,
-        fontWeight: '600',
-        color: '#222',
-        alignSelf: 'flex-start',
-        marginLeft: '10%',
-        marginVertical: 20,
-    },
+  locationIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 8,
+  },
 
-    scrollView: {
-        width: '100%',
-        paddingHorizontal: 10,
-    },
+  locationText: {
+    color: '#333',
+    fontSize: 15,
+    fontWeight: '500',
+  },
 
-    scrollContent: {
-        alignItems: 'center',
-        gap: 15,
-        paddingBottom: 20,
-    },
+  userHeader: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#222',
+    marginVertical: 20,
+    textAlign: 'center',
+  },
 
-    userCard: {
-        width: '85%',
-        backgroundColor: 'black',
-        borderRadius: 20,
-        padding: 15,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 6,
-        elevation: 5,
-    },
+  scrollView: {
+    flex: 1,
+  },
 
-    userName: {
-        fontSize: 24,
-        fontWeight: '500',
-        color: '#fff',
-        textAlign: 'center',
-    },
+  scrollContent: {
+    alignItems: 'center',
+    paddingBottom: 100,
+    gap: 16,
+  },
 
-    userDist: {
-        fontSize: 16,
-        fontWeight: '300',
-        color: '#e0f7fa',
-        textAlign: 'center',
-        marginTop: 6,
-    },
+  userCard: {
+    width: '100%',
+    backgroundColor: '#111',
+    borderRadius: 16,
+    padding: 18,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 5,
+  },
 
-    refreshButton: {
-        position: 'absolute',
-        bottom: 30,
-        width: '85%',
-        borderRadius: 15,
-        height: 55,
-        backgroundColor: '#fff',
-        borderWidth: 3,
-        borderColor: 'black',
-        alignItems: 'center',
-        justifyContent: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-        elevation: 6,
-    },
+  userName: {
+    fontSize: 22,
+    fontWeight: '600',
+    color: '#fff',
+    textAlign: 'center',
+  },
 
-    refreshBtn: {
-        fontSize: 20,
-        fontWeight: '600',
-        color: 'black',
-    },
+  userDist: {
+    fontSize: 15,
+    fontWeight: '300',
+    color: '#aee1f9',
+    textAlign: 'center',
+    marginTop: 6,
+  },
+
+  refreshButton: {
+    position: 'absolute',
+    bottom: 30,
+    left: 20,
+    right: 20,
+    borderRadius: 15,
+    height: 55,
+    backgroundColor: '#000',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 6,
+  },
+
+  refreshBtn: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  emptyState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    marginTop: 40,
+},
+
+emptyImage: {
+    width: 140,
+    height: 140,
+    marginBottom: 20,
+    opacity: 0.8,
+},
+
+emptyText: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    fontWeight: '400',
+},
+loaderViewContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+  },
 });
+
 
 export default Home;
