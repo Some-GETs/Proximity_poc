@@ -21,10 +21,6 @@ const SignupScreen = ({navigation}) => {
 
   const dispatch = useDispatch();
 
-    const signupUrl = 'http://34.220.144.31:8000/signup/'
-
-    const dispatch = useDispatch();
-
     const [username, setUserName] = useState('');
     const [password, setPassword] = useState('');
     const register = async () => {
@@ -51,7 +47,6 @@ const SignupScreen = ({navigation}) => {
             })
         }
     }
-  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
