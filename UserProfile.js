@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import SocialInputRow from './SocialInputRow';
 import axios from 'axios';
@@ -29,7 +31,38 @@ const UserInfoScreen = () => {
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('');
   const [profession, setProfession] = useState('');
-  const [loading, setLoading] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [saveDisabled, setSaveDisabled] = useState(true);
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
+  // change offset based on keyboard appearance
+  const onKeyboardShow = event => {
+    console.log(event.endCoordinates.height);
+    setKeyboardOffset(event.endCoordinates.height);
+  };
+  const onKeyboardHide = () => setKeyboardOffset(0);
+  const keyboardDidShowListener = useRef();
+  const keyboardDidHideListener = useRef();
+  // register keyboard appear/disappear events
+  useEffect(() => {
+    const showEvent =
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent =
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    keyboardDidShowListener.current = Keyboard.addListener(
+      showEvent,
+      onKeyboardShow,
+    );
+    keyboardDidHideListener.current = Keyboard.addListener(
+      hideEvent,
+      onKeyboardHide,
+    );
+
+    return () => {
+      keyboardDidShowListener.current.remove();
+      keyboardDidHideListener.current.remove();
+    };
+  }, []);
 
   const handleSave = async () => {
     setLoading(true);
@@ -65,7 +98,7 @@ const UserInfoScreen = () => {
   };
   const fetchUserData = async () => {
     setLoading(true);
-    console.log('func');
+    console.log('fetchin user...');
     const API_URL = 'http://34.220.144.31:8000/fetch-metadata/';
     const headers = {
       'Content-Type': 'application/json',
@@ -75,7 +108,9 @@ const UserInfoScreen = () => {
       const res = await axios.get(API_URL, {
         headers,
       });
+      console.log(`user data:`);
       console.log(res.data.metadata);
+<<<<<<< HEAD
       if(!res.data.metadata){
         setLoading(false);
         console.log(loading,"loadingggg");
@@ -85,6 +120,13 @@ const UserInfoScreen = () => {
       setInstagram(res?.data?.metadata?.social_media?.instagram_username);
       setLinkedIn(res?.data?.metadata?.social_media?.linkedin_username);
       setTwitter(res?.data?.metadata?.social_media?.twitter);
+=======
+
+      setInstagram(res?.data?.metadata?.social_media?.instagram_username);
+      setLinkedIn(res?.data?.metadata?.social_media?.linkedin_username);
+      setTwitter(res?.data?.metadata?.social_media?.twitter);
+
+>>>>>>> 73f4be7cbc0103851dc10c7f90dec210c40e369c
       setUsername(res?.data?.metadata?.username);
       setMobile(res?.data?.metadata?.mobile_no);
       setImage(res?.data?.metadata?.pfp_url);
@@ -93,10 +135,16 @@ const UserInfoScreen = () => {
       setFullName(res?.data.metadata?.full_name);
       setProfession(res?.data?.metadata?.profession);
       setGender(res?.data?.metadata?.gender);
+<<<<<<< HEAD
+=======
+      setLoading(false);
+>>>>>>> 73f4be7cbc0103851dc10c7f90dec210c40e369c
     } catch {
       console.log(error);
+      setLoading(false);
     }
     setLoading(false);
+    console.log(`loading: ${loading}`);
   };
 
   useEffect(() => {
@@ -105,7 +153,8 @@ const UserInfoScreen = () => {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
       style={styles.wrapper}>
       {loading ? (
         <View style={styles.loadingContainer}>
@@ -113,119 +162,155 @@ const UserInfoScreen = () => {
           <Text style={styles.loadingText}>Loading...</Text>
         </View>
       ) : (
-        <ScrollView contentContainerStyle={styles.container}>
-          {/* Profile Image */}
-          <ImagePickerComponent initialPhotoUrl={image ? image : null} />
-          {/* Username Row */}
-          <View style={styles.inputRow}>
-            <Text style={styles.label}>Username</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter username"
-              value={username}
-              onChangeText={setUsername}
-            />
-          </View>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <ScrollView
+            style={{flex: 1, marginBottom: keyboardOffset * 0.5}}
+            contentContainerStyle={styles.container}
+            keyboardShouldPersistTaps="handled"
+            automaticallyAdjustKeyboardInsets={true}>
+            {/* Profile Image */}
+            <ImagePickerComponent initialPhotoUrl={image ? image : null} />
+            {/* Username Row */}
+            <View style={styles.inputRow}>
+              <Text style={styles.label}>Username</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter username"
+                value={username}
+                editable={false}
+              />
+            </View>
 
-          {/* Mobile Number Row */}
-          <View style={styles.inputRow}>
-            <Text style={styles.label}>Mobile</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter mobile number"
-              keyboardType="phone-pad"
-              value={mobile}
-              onChangeText={setMobile}
-            />
-          </View>
-          {/* Full Name */}
-          <View style={styles.inputRow}>
-            <Text style={styles.label}>Full Name</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter full name"
-              value={fullName}
-              onChangeText={setFullName}
-            />
-          </View>
+            {/* Mobile Number Row */}
+            <View style={styles.inputRow}>
+              <Text style={styles.label}>Mobile</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter mobile number"
+                keyboardType="phone-pad"
+                value={mobile}
+                onChangeText={text => {
+                  setMobile(text);
+                  setSaveDisabled(false);
+                }}
+              />
+            </View>
+            {/* Full Name */}
+            <View style={styles.inputRow}>
+              <Text style={styles.label}>Full Name</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter full name"
+                value={fullName}
+                onChangeText={text => {
+                  setFullName(text);
+                  setSaveDisabled(false);
+                }}
+              />
+            </View>
 
-          {/* Email */}
-          <View style={styles.inputRow}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter email"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              value={email}
-              onChangeText={setEmail}
+            {/* Email */}
+            <View style={styles.inputRow}>
+              <Text style={styles.label}>Email</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter email"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                value={email}
+                onChangeText={text => {
+                  setEmail(text);
+                  setSaveDisabled(false);
+                }}
+              />
+            </View>
+
+            {/* Age */}
+            <View style={styles.inputRow}>
+              <Text style={styles.label}>Age</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter age"
+                keyboardType="numeric"
+                value={age}
+                onChangeText={text => {
+                  setAge(text);
+                  setSaveDisabled(false);
+                }}
+              />
+            </View>
+
+            {/* Gender */}
+            <View style={styles.inputRow}>
+              <Text style={styles.label}>Gender</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter gender"
+                value={gender}
+                onChangeText={text => {
+                  setGender(text);
+                  setSaveDisabled(false);
+                }}
+              />
+            </View>
+
+            {/* Profession */}
+            <View style={styles.inputRow}>
+              <Text style={styles.label}>Profession</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter profession"
+                value={profession}
+                onChangeText={text => {
+                  setProfession(text);
+                  setSaveDisabled(false);
+                }}
+              />
+            </View>
+
+            {/* Social Handles */}
+            <Text style={styles.sectionTitle}>Social Handles</Text>
+
+            {/* Reusable social input row */}
+            <SocialInputRow
+              icon={require('./src/assets/instagram.png')}
+              placeholder="Instagram Handle"
+              value={instagram}
+              onChangeText={text => {
+                setInstagram(text);
+                setSaveDisabled(false);
+              }}
+              iconColor="#C13584"
             />
-          </View>
-
-          {/* Age */}
-          <View style={styles.inputRow}>
-            <Text style={styles.label}>Age</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter age"
-              keyboardType="numeric"
-              value={age}
-              onChangeText={setAge}
+            <SocialInputRow
+              icon={require('./src/assets/linkedin.png')}
+              placeholder="LinkedIn ID"
+              value={linkedIn}
+              onChangeText={text => {
+                setLinkedIn(text);
+                setSaveDisabled(false);
+              }}
+              iconColor="#C13584"
             />
-          </View>
-
-          {/* Gender */}
-          <View style={styles.inputRow}>
-            <Text style={styles.label}>Gender</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter gender"
-              value={gender}
-              onChangeText={setGender}
+            <SocialInputRow
+              icon={require('./src/assets/twitter.png')}
+              placeholder="Twitter Handle"
+              value={twitter}
+              onChangeText={text => {
+                setTwitter(text);
+                setSaveDisabled(false);
+              }}
+              iconColor="#C13584"
             />
-          </View>
-
-          {/* Profession */}
-          <View style={styles.inputRow}>
-            <Text style={styles.label}>Profession</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter profession"
-              value={profession}
-              onChangeText={setProfession}
-            />
-          </View>
-
-          {/* Social Handles */}
-          <Text style={styles.sectionTitle}>Social Handles</Text>
-
-          {/* Reusable social input row */}
-          <SocialInputRow
-            icon={require('./src/assets/instagram.png')}
-            placeholder="Instagram Handle"
-            value={instagram}
-            onChangeText={setInstagram}
-            iconColor="#C13584"
-          />
-          <SocialInputRow
-            icon={require('./src/assets/linkedin.png')}
-            placeholder="LinkedIn ID"
-            value={linkedIn}
-            onChangeText={setLinkedIn}
-            iconColor="#C13584"
-          />
-          <SocialInputRow
-            icon={require('./src/assets/twitter.png')}
-            placeholder="Twitter Handle"
-            value={twitter}
-            onChangeText={setTwitter}
-            iconColor="#C13584"
-          />
-        </ScrollView>
+          </ScrollView>
+        </TouchableWithoutFeedback>
       )}
       {/* Save Button Fixed at Bottom */}
       <View style={styles.bottomContainer}>
-        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+        <TouchableOpacity
+          style={saveDisabled ? styles.saveButtonDisabled : styles.saveButton}
+          onPress={handleSave}
+          disabled={saveDisabled}>
           <Text style={styles.saveButtonText}>Save</Text>
         </TouchableOpacity>
       </View>
@@ -240,6 +325,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   container: {
+    flexGrow: 1,
     padding: 20,
     paddingBottom: 100, // Add space for bottom button
   },
@@ -279,14 +365,21 @@ const styles = StyleSheet.create({
   },
   bottomContainer: {
     position: 'absolute',
-    bottom: 20,
-    left: 20,
-    right: 20,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff',
   },
   saveButton: {
     backgroundColor: '#000',
     paddingVertical: 15,
-    borderRadius: 10,
+    // borderRadius: 10,
+    alignItems: 'center',
+  },
+  saveButtonDisabled: {
+    backgroundColor: 'gray',
+    paddingVertical: 15,
+    // borderRadius: 10,
     alignItems: 'center',
   },
   saveButtonText: {
