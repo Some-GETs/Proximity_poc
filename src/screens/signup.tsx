@@ -21,7 +21,6 @@ const SignupScreen = ({navigation}) => {
 
   const dispatch = useDispatch();
 
-<<<<<<< HEAD
     const signupUrl = 'http://34.220.144.31:8000/signup/'
 
     const dispatch = useDispatch();
@@ -51,27 +50,6 @@ const SignupScreen = ({navigation}) => {
                 text1: "Try again after sometime!"
             })
         }
-=======
-  const [username, setUserName] = useState('');
-  const [password, setPassword] = useState('');
-  const register = async () => {
-    try {
-      const body = {
-        username,
-        password,
-      };
-      const resp = await axios.post(signupUrl, body);
-      Toast.show({
-        type: 'success',
-        text1: 'User Registered',
-        text2: 'Logged in successfully',
-      });
-      const token = resp?.data?.token || null;
-      dispatch(setCredentials({token: token, user: username}));
-      navigation.replace('Onboard');
-    } catch (error) {
-      console.log(error);
->>>>>>> 73f4be7cbc0103851dc10c7f90dec210c40e369c
     }
   };
 

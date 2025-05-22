@@ -110,23 +110,11 @@ const UserInfoScreen = () => {
       });
       console.log(`user data:`);
       console.log(res.data.metadata);
-<<<<<<< HEAD
-      if(!res.data.metadata){
-        setLoading(false);
-        console.log(loading,"loadingggg");
-      }
-
-      console.log("after loading falseee");
-      setInstagram(res?.data?.metadata?.social_media?.instagram_username);
-      setLinkedIn(res?.data?.metadata?.social_media?.linkedin_username);
-      setTwitter(res?.data?.metadata?.social_media?.twitter);
-=======
 
       setInstagram(res?.data?.metadata?.social_media?.instagram_username);
       setLinkedIn(res?.data?.metadata?.social_media?.linkedin_username);
       setTwitter(res?.data?.metadata?.social_media?.twitter);
 
->>>>>>> 73f4be7cbc0103851dc10c7f90dec210c40e369c
       setUsername(res?.data?.metadata?.username);
       setMobile(res?.data?.metadata?.mobile_no);
       setImage(res?.data?.metadata?.pfp_url);
@@ -135,10 +123,6 @@ const UserInfoScreen = () => {
       setFullName(res?.data.metadata?.full_name);
       setProfession(res?.data?.metadata?.profession);
       setGender(res?.data?.metadata?.gender);
-<<<<<<< HEAD
-=======
-      setLoading(false);
->>>>>>> 73f4be7cbc0103851dc10c7f90dec210c40e369c
     } catch {
       console.log(error);
       setLoading(false);

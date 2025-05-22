@@ -24,7 +24,6 @@ const LoginScreen = ({navigation}) => {
   const [username, setUserName] = useState('');
   const [password, setPassword] = useState('');
 
-<<<<<<< HEAD
     const login = async () => {
       console.log('➡️ hitting', signupUrl);                 // ① see real URL
       try {
@@ -54,28 +53,6 @@ const LoginScreen = ({navigation}) => {
                           text1: "Network error",
                       })
         }
-=======
-  const login = async () => {
-    console.log('➡️ hitting', signupUrl); // ① see real URL
-    try {
-      const {data, status, config} = await axios.post(
-        signupUrl,
-        {username, password},
-        {headers: {'Content-Type': 'application/json'}},
-      );
-      const token = data?.token;
-      console.log(token);
-      console.log('✅', status, data);
-      dispatch(setCredentials({token: token, user: username}));
-      navigation.replace('Home'); //changed this from Home to Details
-    } catch (err) {
-      if (err.response) {
-        console.log('❌ SERVER', err.response.status, err.response.data);
-        console.log('❌ URL', err.config.url); // ② confirm path/slash
-      } else {
-        console.log('❌ NETWORK', err.message);
-      }
->>>>>>> 73f4be7cbc0103851dc10c7f90dec210c40e369c
     }
   };
   return (
