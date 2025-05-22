@@ -12,7 +12,7 @@ import {
   Image,
   Alert,
 } from 'react-native';
-import { useSelector } from 'react-redux';
+import {useSelector} from 'react-redux';
 import Geolocation from 'react-native-geolocation-service';
 
 // const API_URL = 'http://34.220.144.31:8000/fetch-users-mg/';
@@ -65,7 +65,7 @@ const requestLocationPermission = async () => {
   return false;
 };
 
-const Home = () => {
+const Home = ({navigation}) => {
   // Get token from route params
   const token = useSelector((state)=> state.auth.token);
   console.log(token);
@@ -120,13 +120,13 @@ const Home = () => {
       console.log('And headers:', JSON.stringify(headers));
       
       // Try ping the server first to see if it's reachable
-      try {
-        const pingResponse = await axios.get(`${API_BASE_URL}/`);
-        console.log('Server ping response:', pingResponse.status);
-      } catch (pingError) {
-        console.log('Server ping failed:', pingError);
-        // Continue anyway - the ping endpoint might not exist
-      }
+    //   try {
+    //     const pingResponse = await axios.get(`${API_BASE_URL}/`);
+    //     console.log('Server ping response:', pingResponse.status);
+    //   } catch (pingError) {
+    //     console.log('Server ping failed:', pingError);
+    //     // Continue anyway - the ping endpoint might not exist
+    //   }
       
       // Update user's location
       const updateResponse = await axios.post(
@@ -137,7 +137,6 @@ const Home = () => {
       
       console.log('Location update response:', updateResponse.data);
       
-      // Fetch nearby users
       const usersResponse = await axios.post(
         FETCH_USERS_ENDPOINT,
         {
@@ -244,140 +243,154 @@ const Home = () => {
     }
   };
 
-  return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.refreshButton}
-        onPress={sendLocation}
-        disabled={loading}
-      >
-        <Text style={styles.refreshBtn}>{loading ? 'Loading...' : 'Refresh Users'}</Text>
-      </TouchableOpacity>
-      
-      <View style={styles.locationContainer}>
-        <Image
-          source={require('../../location_pin.png')}
-          style={styles.locationIcon}
-        />
-        <Text style={styles.locationStyle}>
-          {location
-            ? `${location.coords.latitude.toFixed(6)}, ${location.coords.longitude.toFixed(6)}`
-            : 'Fetching your location...'}
-        </Text>
-      </View>
-      
-      {users.length > 0 ? (
-        <>
-          <Text style={styles.userHeader}>Active Users</Text>
-          <ScrollView
-            scrollEnabled={true}
-            style={styles.scrollView}
-            contentContainerStyle={styles.scrollContent}>
-            {users.map((item, index) => (
-              <View
-                key={index}
-                style={styles.userCard}>
-                <Text style={styles.userName}>{item.name}</Text>
-                <Text style={styles.userDist}>{`${item.distance}m away`}</Text>
-              </View>
-            ))}
-          </ScrollView>
-        </>
-      ) : (
-        <Text style={styles.noUsersText}>No users found nearby</Text>
-      )}
-    </View>
-  );
-};
+  const handleAbout = () => {
+    navigation.navigate('Account');
+  }
 
+   return (
+    <View style={styles.container}>
+
+        
+        <TouchableOpacity style={styles.aboutIcon} onPress={handleAbout}>
+            <Image
+                source={require('../../account_icon.png')}
+                style={styles.locationIcon}
+            />
+        </TouchableOpacity>
+        <View style={styles.locationContainer}>
+            <Image
+                source={require('../../location_pin.png')}
+                style={styles.locationIcon}
+            />
+            <Text style={styles.locationStyle}>
+                {location
+                    ? `${location.coords.latitude}, ${location.coords.longitude}`
+                    : null}
+            </Text>
+        </View>
+
+        {users && (
+            <>
+                <Text style={styles.userHeader}>Nearby Active Users</Text>
+                <ScrollView
+                    scrollEnabled={true}
+                    style={styles.scrollView}
+                    contentContainerStyle={styles.scrollContent}>
+                    {users.map((item, index) => (
+                        <View key={index} style={styles.userCard}>
+                            <Text style={styles.userName}>{item.name}</Text>
+                            <Text style={styles.userDist}>{`${item.distance}m away`}</Text>
+                        </View>
+                    ))}
+                </ScrollView>
+            </>
+        )}
+
+        <TouchableOpacity style={styles.refreshButton} onPress={sendLocation}>
+            <Text style={styles.refreshBtn}>Refresh Users</Text>
+        </TouchableOpacity>
+    </View>
+);
+};
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-  },
-  refreshButton: {
-    width: '80%',
-    margin: 20,
-    borderRadius: 15,
-    height: 50,
-    backgroundColor: 'black',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  locationContainer: {
-    alignSelf: 'flex-start',
-    marginLeft: '10%',
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  locationIcon: {
-    width: 30,
-    height: 30,
-    marginHorizontal: 15,
-  },
-  scrollView: {
-    width: '100%',
-  },
-  scrollContent: {
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    paddingBottom: 20,
-  },
-  userHeader: {
-    fontSize: 36,
-    fontWeight: '500',
-    color: 'black',
-    alignSelf: 'flex-start',
-    marginLeft: '10%',
-    marginVertical: 20,
-  },
-  locationStyle: {
-    color: 'black',
-    fontWeight: '300',
-    fontSize: 18,
-  },
-  userCard: {
-    padding: 20,
-    borderRadius: 20,
-    backgroundColor: '#000',
-    marginVertical: 5,
-    width: '80%',
-    minHeight: 150,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-  },
-  userName: {
-    fontWeight: '300',
-    fontSize: 32,
-    color: 'white',
-  },
-  userDist: {
-    fontWeight: '300',
-    fontSize: 24,
-    color: 'white',
-    marginTop: 10,
-  },
-  refreshBtn: {
-    fontWeight: '300',
-    fontSize: 16,
-    color: 'white',
-  },
-  noUsersText: {
-    fontSize: 18,
-    color: '#666',
-    marginTop: 30,
-  },
+    container: {
+        flex: 1,
+        backgroundColor: '#f4f6fa',
+        alignItems: 'center',
+        paddingTop: 40,
+        paddingBottom: 20,
+    },
+
+    locationContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        alignSelf: 'flex-start',
+        marginLeft: '10%',
+        marginBottom: 10,
+    },
+
+    locationIcon: {
+        width: 28,
+        height: 28,
+        marginRight: 10,
+    },
+
+    locationStyle: {
+        color: '#333',
+        fontSize: 16,
+        fontWeight: '400',
+    },
+
+    userHeader: {
+        fontSize: 28,
+        fontWeight: '600',
+        color: '#222',
+        alignSelf: 'flex-start',
+        marginLeft: '10%',
+        marginVertical: 20,
+    },
+
+    scrollView: {
+        width: '100%',
+        paddingHorizontal: 10,
+    },
+
+    scrollContent: {
+        alignItems: 'center',
+        gap: 15,
+        paddingBottom: 20,
+    },
+
+    userCard: {
+        width: '85%',
+        backgroundColor: 'black',
+        borderRadius: 20,
+        padding: 15,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        elevation: 5,
+    },
+
+    userName: {
+        fontSize: 24,
+        fontWeight: '500',
+        color: '#fff',
+        textAlign: 'center',
+    },
+
+    userDist: {
+        fontSize: 16,
+        fontWeight: '300',
+        color: '#e0f7fa',
+        textAlign: 'center',
+        marginTop: 6,
+    },
+
+    refreshButton: {
+        position: 'absolute',
+        bottom: 30,
+        width: '85%',
+        borderRadius: 15,
+        height: 55,
+        backgroundColor: '#fff',
+        borderWidth: 3,
+        borderColor: 'black',
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 6,
+    },
+
+    refreshBtn: {
+        fontSize: 20,
+        fontWeight: '600',
+        color: 'black',
+    },
 });
 
 export default Home;

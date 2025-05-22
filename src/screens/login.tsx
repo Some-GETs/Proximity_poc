@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity} from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet,TouchableOpacity} from 'react-native';
 import { useState } from 'react';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
@@ -36,84 +36,99 @@ const LoginScreen = ({ navigation }) => {
         } else {
           console.log('❌ NETWORK', err.message);
         }
-      }
-    };
-    return (
-       <View style={styles.container}>
-      <Text style={styles.heading}>Login</Text>
+    }
+  }
+return (
+  <View style={styles.container}>
+    <Text style={styles.heading}>Welcome Back 👋</Text>
 
-      <TextInput
-        placeholder="Username"
-        placeholderTextColor="#999"
-        value={username}
-        onChangeText={text => setUserName(text)}
-        style={styles.input}
-      />
+    <TextInput
+      placeholder="Username"
+      placeholderTextColor="#aaa"
+      value={username}
+      onChangeText={text => setUserName(text)}
+      style={styles.input}
+    />
 
-      <TextInput
-        placeholder="Password"
-        placeholderTextColor="#999"
-        value={password}
-        onChangeText={text => setPassword(text)}
-        secureTextEntry
-        style={styles.input}
-      />
+    <TextInput
+      placeholder="Password"
+      placeholderTextColor="#aaa"
+      value={password}
+      onChangeText={text => setPassword(text)}
+      secureTextEntry
+      style={styles.input}
+    />
 
-      {/* <View style={styles.buttonContainer}> */}
-      <TouchableOpacity style={styles.buttonContainer} onPress={login}>
-        <Text style={{color: 'black'}}>Login</Text>
-      </TouchableOpacity>
-        <Button title="Login" onPress={login} color="#000" />
-      {/* </View> */}
+    <TouchableOpacity style={styles.button} onPress={login}>
+      <Text style={styles.buttonText}>Log In</Text>
+    </TouchableOpacity>
 
-      <Text onPress={() => navigation.navigate('Signup')} style={styles.link}>
-        Don't have an account? Sign up
-      </Text>
-    </View>
-    );
+    <Text onPress={() => navigation.navigate('Signup')} style={styles.link}>
+      Don't have an account? <Text style={styles.linkHighlight}>Sign up</Text>
+    </Text>
+  </View>
+);
+
 };
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'black',
+    backgroundColor: '#0a0a0a',
     paddingHorizontal: 30,
     justifyContent: 'center',
   },
   heading: {
-    fontSize: 32,
-    color: 'white',
-    fontWeight: 'bold',
-    marginBottom: 30,
+    fontSize: 34,
+    color: '#fff',
+    fontWeight: '700',
+    marginBottom: 40,
     textAlign: 'center',
   },
   input: {
-    backgroundColor: 'white',
-    color: 'black',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    paddingVertical: 12,
+    backgroundColor: '#1e1e1e',
+    color: '#fff',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     fontSize: 16,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#333',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
-  buttonContainer: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    borderColor: '#fff',
-    alignSelf: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 10
-    // overflow: 'hidden',
+  button: {
+    backgroundColor: '#00b894',
+    paddingVertical: 15,
+    borderRadius: 12,
+    alignItems: 'center',
+    shadowColor: '#00b894',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 5,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
   },
   link: {
-    color: '#ccc',
-    marginTop: 20,
+    color: '#bbb',
+    marginTop: 25,
     textAlign: 'center',
     fontSize: 16,
-    textDecorationLine: 'underline',
+  },
+  linkHighlight: {
+    color: '#00cec9',
+    fontWeight: '500',
   },
 });
+
 
 export default LoginScreen;
