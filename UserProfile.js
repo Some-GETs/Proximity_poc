@@ -147,7 +147,7 @@ const UserInfoScreen = () => {
       ) : (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <ScrollView
-            style={{flex: 1, marginBottom: Platform.OS=='ios'?0: keyboardOffset * 0.15}}
+            style={{flex: 1, marginBottom: Platform.OS=='ios'?0: keyboardOffset * 0.5}}
             contentContainerStyle={styles.container}
             keyboardShouldPersistTaps="handled"
             automaticallyAdjustKeyboardInsets={true}>
