@@ -36,8 +36,10 @@ const SignupScreen = ({navigation}) => {
                 text2: "Logged in successfully",
             })
             const token = resp?.data?.token || null;
+            console.log("<<<<<<<")
             dispatch(setCredentials({ token: token, user: username }));
-            navigation.replace('Onboard');
+            console.log("111111111");
+            navigation.navigate('Onboard');
 
         } catch (error) {
             console.log(error);

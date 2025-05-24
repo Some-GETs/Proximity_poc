@@ -17,7 +17,7 @@ import {useDispatch} from 'react-redux';
 import ImagePickerComponent from './ImagePickerComponent';
 // import * as ImagePicker from 'expo-image-picker';
 
-const OnboardingScreen = ({navigation}) => {
+const OnboardScreen = ({navigation}) => {
   const [username, setUsername] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
   const [email, setEmail] = useState('');
@@ -214,4 +214,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default OnboardingScreen;
+export default OnboardScreen;
