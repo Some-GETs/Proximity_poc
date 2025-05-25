@@ -36,8 +36,7 @@ const LoginScreen = ({navigation}) => {
         console.log(token)
         console.log('✅', status, data);
         dispatch(setCredentials({token: token, user: username}));
-        navigation.replace('Home'); //changed this from Home to Details
-
+        navigation.navigate('Home');
       } catch (err) {
         if (err.response) {
           console.log('❌ SERVER', err.response.status, err.response.data);

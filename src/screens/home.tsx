@@ -14,8 +14,9 @@ import {
   Alert,
   ActivityIndicator
 } from 'react-native';
-import {useSelector} from 'react-redux';
+import {useSelector,useDispatch} from 'react-redux';
 import Geolocation from 'react-native-geolocation-service';
+import {logout} from '../redux/auth';
 
 // const API_URL = 'http://34.220.144.31:8000/fetch-users-mg/';
 // const API_URL2 = 'http://34.220.144.31:8000/update-location2/';
@@ -70,9 +71,12 @@ const requestLocationPermission = async () => {
 const Home = ({navigation}) => {
   // Get token from route params
   const token = useSelector((state)=> state.auth.token);
+
   const details = useSelector((state) => state.details);
   console.log(details);
   console.log(token);
+
+  const dispatch = useDispatch();
   
   // State variables
   const [location, setLocation] = useState(null);
@@ -253,6 +257,12 @@ const Home = ({navigation}) => {
     navigation.navigate('Account');
   }
 
+  const handleLogout = () => {
+    console.log("loging outt");
+    dispatch(logout());
+    navigation.navigate('Login');
+  }
+
    return (
   <View style={styles.container}>
     <View style={styles.topBar}>
@@ -267,6 +277,9 @@ const Home = ({navigation}) => {
             : 'Fetching...'}
         </Text>
       </View>
+      <TouchableOpacity>
+        <Text onPress={handleLogout}>Logout</Text>
+      </TouchableOpacity>
     </View>
 
 {loading ? (

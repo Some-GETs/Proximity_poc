@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -12,11 +12,13 @@ import {
   ActivityIndicator,
   TouchableWithoutFeedback,
   Keyboard,
+  Button
 } from 'react-native';
 import SocialInputRow from './SocialInputRow';
 import axios from 'axios';
-import {useSelector} from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import ImagePickerComponent from './src/screens/ImagePickerComponent';
+import {logout} from './src/redux/auth'
 
 const UserInfoScreen = () => {
   const token = useSelector(state => state.auth.token);
@@ -34,6 +36,7 @@ const UserInfoScreen = () => {
   const [loading, setLoading] = useState(false);
   const [saveDisabled, setSaveDisabled] = useState(true);
   const [keyboardOffset, setKeyboardOffset] = useState(0);
+  const dispatch = useDispatch();
   // change offset based on keyboard appearance
   const onKeyboardShow = event => {
     console.log(event.endCoordinates.height);
@@ -93,7 +96,7 @@ const UserInfoScreen = () => {
       console.log(error);
     }
     // Handle save logic here
-    console.log({username, mobile, instagram});
+    console.log({ username, mobile, instagram });
     setLoading(false);
   };
   const fetchUserData = async () => {
@@ -127,8 +130,13 @@ const UserInfoScreen = () => {
       console.log(error);
       setLoading(false);
     }
-  setLoading(false);
+    setLoading(false);
   };
+
+  const handleLogout = () => {
+    dispatch(logout());
+    NavigationContainer.navigate("Login");
+  }
 
   useEffect(() => {
     fetchUserData();
@@ -146,11 +154,15 @@ const UserInfoScreen = () => {
         </View>
       ) : (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          {/* <TouchableOpacity onPress={handleLogout}> Logout </TouchableOpacity> */}
           <ScrollView
-            style={{flex: 1, marginBottom: Platform.OS=='ios'?0: keyboardOffset * 0.5}}
+            style={{ flex: 1, marginBottom: Platform.OS == 'ios' ? 0 : keyboardOffset * 0.5 }}
             contentContainerStyle={styles.container}
             keyboardShouldPersistTaps="handled"
             automaticallyAdjustKeyboardInsets={true}>
+            <TouchableOpacity onPress={handleLogout}>
+              <Text >Logout</Text>
+            </TouchableOpacity>
             {/* Profile Image */}
             <ImagePickerComponent initialPhotoUrl={image ? image : null} />
             {/* Username Row */}
