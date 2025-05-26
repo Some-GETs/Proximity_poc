@@ -23,7 +23,7 @@ function AppInitializer() {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const user = useSelector((state) => state.auth.user);
-  const [show,setShow] = useState('false');
+  const [show,setShow] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -31,6 +31,7 @@ function AppInitializer() {
       // const userData = await AsyncStorage.getItem('user');
       console.log(token);
       if (token) {
+        console.log("setting show as truee");
         dispatch(setCredentials({ token}));
         setShow(true);
       }
@@ -49,8 +50,7 @@ function AppInitializer() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {!show ? (
+      <Stack.Navigator initialRouteName= { show ? 'Home' : 'Login'} screenOptions={{ headerShown: false }}>
           <>
             <Stack.Screen name="Login" component={LoginScreen} screenOptions={{ headerShown: false }}/>
             <Stack.Screen name="Signup" component={SignupScreen} screenOptions={{ headerShown: false }}/>
@@ -59,16 +59,6 @@ function AppInitializer() {
             <Stack.Screen name="Account" component={UserInfoScreen} />
             <Stack.Screen name="Details" component={DetailsScreen} />
           </>
-        ) : (
-          <>
-          <Stack.Screen name="Home" component={HomeScreen} screenOptions={{ headerShown: false }}/>
-          <Stack.Screen name="Onboard" component={OnboardScreen} screenOptions={{ headerShown: false }}/>
-          <Stack.Screen name="Details" component={DetailsScreen} />
-            <Stack.Screen name="Account" component={UserInfoScreen} />
-            <Stack.Screen name="Login" component={LoginScreen} screenOptions={{ headerShown: false }}/>
-            <Stack.Screen name="Signup" component={SignupScreen} screenOptions={{ headerShown: false }}/>
-          </>
-        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
