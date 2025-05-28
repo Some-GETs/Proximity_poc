@@ -2,7 +2,6 @@
 
 import React from 'react';
 import {View, TextInput, StyleSheet, Image} from 'react-native';
-// import Icon from 'react-native-vector-icons/FontAwesome';
 
 const SocialInputRow = ({
   icon,
