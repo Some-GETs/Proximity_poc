@@ -20,7 +20,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import ImagePickerComponent from './ImagePickerComponent';
 import {logout} from '../redux/auth';
 
-const UserInfoScreen = () => {
+const UserInfoScreen = ({navigation}) => {
   const token = useSelector(state => state.auth.token);
   const [image, setImage] = useState(null);
   const [username, setUsername] = useState('');
@@ -163,9 +163,18 @@ const UserInfoScreen = () => {
             contentContainerStyle={styles.container}
             keyboardShouldPersistTaps="handled"
             automaticallyAdjustKeyboardInsets={true}>
-            <TouchableOpacity onPress={handleLogout}>
-              <Text>Logout</Text>
-            </TouchableOpacity>
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.goBack();
+                }}>
+                <Text>Back</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleLogout}>
+                <Text>Logout</Text>
+              </TouchableOpacity>
+            </View>
             {/* Profile Image */}
             <ImagePickerComponent initialPhotoUrl={image ? image : null} />
             {/* Username Row */}
