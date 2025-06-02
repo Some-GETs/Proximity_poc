@@ -110,8 +110,7 @@ const ImagePickerComponent = ({initialPhotoUrl}) => {
       setIsUploadAllowed(false);
       console.log(res.data);
     } catch (error) {
-      ;
-      console.log("erroroor"+" "+JSON.stringify(error.response.data));
+      console.log('erroroor' + ' ' + JSON.stringify(error.response.data));
     }
   };
   useEffect(() => {
@@ -124,7 +123,7 @@ const ImagePickerComponent = ({initialPhotoUrl}) => {
         <Image source={{uri: photo.uri}} style={styles.imagePreview} />
       ) : (
         <Image
-          source={require('../../accountImage.png')}
+          source={require('../assets/accountImage.png')}
           style={styles.imagePreview}
         />
       )}

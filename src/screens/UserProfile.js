@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -12,15 +12,15 @@ import {
   ActivityIndicator,
   TouchableWithoutFeedback,
   Keyboard,
-  Button
+  Button,
 } from 'react-native';
 import SocialInputRow from './SocialInputRow';
 import axios from 'axios';
-import { useSelector, useDispatch } from 'react-redux';
-import ImagePickerComponent from './src/screens/ImagePickerComponent';
-import {logout} from './src/redux/auth'
+import {useSelector, useDispatch} from 'react-redux';
+import ImagePickerComponent from './ImagePickerComponent';
+import {logout} from '../redux/auth';
 
-const UserInfoScreen = () => {
+const UserInfoScreen = ({navigation}) => {
   const token = useSelector(state => state.auth.token);
   const [image, setImage] = useState(null);
   const [username, setUsername] = useState('');
@@ -96,7 +96,7 @@ const UserInfoScreen = () => {
       console.log(error);
     }
     // Handle save logic here
-    console.log({ username, mobile, instagram });
+    console.log({username, mobile, instagram});
     setLoading(false);
   };
   const fetchUserData = async () => {
@@ -135,8 +135,8 @@ const UserInfoScreen = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    NavigationContainer.navigate("Login");
-  }
+    NavigationContainer.navigate('Login');
+  };
 
   useEffect(() => {
     fetchUserData();
@@ -156,13 +156,25 @@ const UserInfoScreen = () => {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           {/* <TouchableOpacity onPress={handleLogout}> Logout </TouchableOpacity> */}
           <ScrollView
-            style={{ flex: 1, marginBottom: Platform.OS == 'ios' ? 0 : keyboardOffset * 0.5 }}
+            style={{
+              flex: 1,
+              marginBottom: Platform.OS == 'ios' ? 0 : keyboardOffset * 0.5,
+            }}
             contentContainerStyle={styles.container}
             keyboardShouldPersistTaps="handled"
             automaticallyAdjustKeyboardInsets={true}>
-            <TouchableOpacity onPress={handleLogout}>
-              <Text >Logout</Text>
-            </TouchableOpacity>
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.goBack();
+                }}>
+                <Text>Back</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleLogout}>
+                <Text>Logout</Text>
+              </TouchableOpacity>
+            </View>
             {/* Profile Image */}
             <ImagePickerComponent initialPhotoUrl={image ? image : null} />
             {/* Username Row */}
@@ -268,7 +280,7 @@ const UserInfoScreen = () => {
 
             {/* Reusable social input row */}
             <SocialInputRow
-              icon={require('./src/assets/instagram.png')}
+              icon={require('../assets/instagram.png')}
               placeholder="Instagram Handle"
               value={instagram}
               onChangeText={text => {
@@ -278,7 +290,7 @@ const UserInfoScreen = () => {
               iconColor="#C13584"
             />
             <SocialInputRow
-              icon={require('./src/assets/linkedin.png')}
+              icon={require('../assets/linkedin.png')}
               placeholder="LinkedIn ID"
               value={linkedIn}
               onChangeText={text => {
@@ -288,7 +300,7 @@ const UserInfoScreen = () => {
               iconColor="#C13584"
             />
             <SocialInputRow
-              icon={require('./src/assets/twitter.png')}
+              icon={require('../assets/twitter.png')}
               placeholder="Twitter Handle"
               value={twitter}
               onChangeText={text => {
