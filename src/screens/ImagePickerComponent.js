@@ -70,7 +70,7 @@ const ImagePickerComponent = ({initialPhotoUrl}) => {
           return;
         }
         setPhoto(response.assets[0]);
-        setIsUploadAllowed(true);
+        uploadData();
       },
     );
   };
@@ -80,7 +80,7 @@ const ImagePickerComponent = ({initialPhotoUrl}) => {
       if (response.didCancel || response.errorCode) return;
       console.log(`photo upload: ${response.assets.length}`);
       setPhoto(response.assets[0]);
-      setIsUploadAllowed(true);
+      uploadData();
     });
   };
 
@@ -107,7 +107,7 @@ const ImagePickerComponent = ({initialPhotoUrl}) => {
           headers,
         },
       );
-      setIsUploadAllowed(false);
+      // setIsUploadAllowed(false);
       console.log(res.data);
     } catch (error) {
       console.log('erroroor' + ' ' + JSON.stringify(error.response.data));
@@ -127,11 +127,11 @@ const ImagePickerComponent = ({initialPhotoUrl}) => {
           style={styles.imagePreview}
         />
       )}
-      {isUploadAllowed && (
+      {/* {isUploadAllowed && (
         <TouchableOpacity onPress={uploadData}>
           <Text style={{color: '#28a745'}}>Upload</Text>
         </TouchableOpacity>
-      )}
+      )} */}
       <TouchableOpacity style={styles.button} onPress={handleImageSelection}>
         <Text style={styles.buttonText}>
           {photo ? 'Change Photo' : 'Upload Photo'}
