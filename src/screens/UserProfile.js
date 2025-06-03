@@ -135,7 +135,7 @@ const UserInfoScreen = ({navigation}) => {
 
   const handleLogout = () => {
     dispatch(logout());
-    NavigationContainer.navigate('Login');
+    navigation.navigate('Login');
   };
 
   useEffect(() => {
